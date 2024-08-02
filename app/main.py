@@ -1,7 +1,9 @@
 import json
+import datetime
+
 from app.customer import Customer
 from app.shop import Shop
-import datetime
+from app.car import Car
 
 
 def shop_trip() -> None:
@@ -9,8 +11,33 @@ def shop_trip() -> None:
         file_data = json.load(file)
     fuel_price = file_data["FUEL_PRICE"]
 
-    customers = Customer.get_customer_info()
-    shops = Shop.get_shop_info()
+    customers = []
+    _customers = file_data["customers"]
+    for i in _customers:
+        car_data = i["car"]
+        car = Car(
+            brand=car_data["brand"],
+            fuel_consumption=car_data["fuel_consumption"]
+        )
+        customer = Customer(
+            name=i["name"],
+            products=i["product_cart"],
+            location=i["location"],
+            money=i["money"],
+            car=car
+        )
+        customers.append(customer)
+
+    shops = []
+    _shops = file_data["shops"]
+
+    for i in _shops:
+        shop = Shop(
+            name=i["name"],
+            location=i["location"],
+            products=i["products"]
+        )
+        shops.append(shop)
 
     for customer in customers:
         print(f"{customer.name} has {customer.money} dollars")
