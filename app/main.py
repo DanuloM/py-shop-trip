@@ -11,33 +11,22 @@ def shop_trip() -> None:
         file_data = json.load(file)
     fuel_price = file_data["FUEL_PRICE"]
 
-    customers = []
     _customers = file_data["customers"]
-    for i in _customers:
-        car_data = i["car"]
-        car = Car(
-            brand=car_data["brand"],
-            fuel_consumption=car_data["fuel_consumption"]
-        )
-        customer = Customer(
+    customers = [
+        Customer(
             name=i["name"],
             products=i["product_cart"],
             location=i["location"],
             money=i["money"],
-            car=car
-        )
-        customers.append(customer)
-
-    shops = []
+            car=Car(
+                brand=i["car"]["brand"],
+                fuel_consumption=i["car"]["fuel_consumption"]
+            )
+        ) for i in _customers
+    ]
     _shops = file_data["shops"]
 
-    for i in _shops:
-        shop = Shop(
-            name=i["name"],
-            location=i["location"],
-            products=i["products"]
-        )
-        shops.append(shop)
+    shops = [Shop(**shop) for shop in _shops]
 
     for customer in customers:
         print(f"{customer.name} has {customer.money} dollars")
@@ -72,8 +61,8 @@ def shop_trip() -> None:
                 _cost = f"{int(cost)}" if cost.is_integer() else f"{cost:.1f}"
                 print(f"{quantity} {product}s for {_cost} dollars")
 
-            print(f"Total cost is {best_product_price} dollars")
-            print("See you again!\n")
+            print(f"Total cost is {best_product_price} dollars"
+                  f"\nSee you again!\n")
 
             money_left = customer.money - best_total_cost
             print(f"{customer.name} rides home")
